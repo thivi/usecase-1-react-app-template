@@ -1,0 +1,10 @@
+{
+    "baseUrl": "https://api.asgardeo.io/t/thivi",
+    "clientID": "_0tQekwvAFBGRnNRq0vGG8eb6qwa",
+    "scope": [
+        "openid",
+        "profile"
+    ],
+    "signInRedirectURL": "http://localhost:3000",
+    "signOutRedirectURL": "http://localhost:3000"
+}

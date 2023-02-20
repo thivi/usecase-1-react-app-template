@@ -1,20 +1,34 @@
 // import logo from './logo.svg';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import './App.scss';
 import { Nav, Navbar, Container }  from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import Catalog from './components/Catalog/Catalog.js';
 import MyCart from './components/MyCart/Cart.js';
 import Admin from './components/Admin/Admin.js';
+import { useAuthContext } from "@asgardeo/auth-react";
 
 // Component to render the login/signup/logout menu
 const RightLoginSignupMenu = () => {
   // Based on Asgardeo SDK, set a variable like below to check and conditionally render the menu
   let isLoggedIn = false;
+
+  const { signIn, isAuthenticated, getBasicUserInfo } = useAuthContext();
+  const [ userInfo, setUserInfo ] = useState(null);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    getBasicUserInfo().then((response) => {
+      setUserInfo(response);
+    });
+  }, [ isAuthenticated, getBasicUserInfo ]);
 
   // Host the menu content and return it at the end of the function
   let menu;
@@ -29,7 +43,9 @@ const RightLoginSignupMenu = () => {
   } else {
     menu = <>
       <Nav>
-      <Nav.Link href="#deets">Login</Nav.Link>          
+        { isAuthenticated
+          ? <Nav.Link>{ userInfo?.username } </Nav.Link>
+          : <Nav.Link onClick={ () => signIn() }>Login</Nav.Link> }
       <Nav.Link href="#deets">Sign Up</Nav.Link></Nav>
     </>
   }
@@ -67,11 +83,11 @@ const App = () => {
     <>
     <PetStoreNav />
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Catalog />} />
-        <Route path="/mycart" element={<MyCart />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
+      <Switch>
+        <Route path="/" component={Catalog} />
+        <Route path="/mycart" component={MyCart} />
+        <Route path="/admin" component={Admin} />
+      </Switch>
     </BrowserRouter>
     </>
   );
