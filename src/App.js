@@ -14,41 +14,40 @@ import { useAuthContext } from "@asgardeo/auth-react";
 
 // Component to render the login/signup/logout menu
 const RightLoginSignupMenu = () => {
-  // Based on Asgardeo SDK, set a variable like below to check and conditionally render the menu
-  let isLoggedIn = false;
 
-  const { signIn, isAuthenticated, getBasicUserInfo } = useAuthContext();
+  const { signIn, state, getBasicUserInfo } = useAuthContext();
   const [ userInfo, setUserInfo ] = useState(null);
+  // Based on Asgardeo SDK, set a variable like below to check and conditionally render the menu
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!state.isAuthenticated) {
       return;
     }
 
     getBasicUserInfo().then((response) => {
       setUserInfo(response);
     });
-  }, [ isAuthenticated, getBasicUserInfo ]);
+  }, [ state.isAuthenticated, getBasicUserInfo ]);
 
   // Host the menu content and return it at the end of the function
   let menu;
 
   // Conditionally render the following two links based on whether the user is logged in or not
-  if (isLoggedIn) {
+  if (state.isAuthenticated) {
     menu =  <>
       <Nav>
-      <Nav.Link href="#deets">Logout</Nav.Link>
-      <Nav.Link href="#deets"><FontAwesomeIcon icon={faUser} /></Nav.Link></Nav>
+        <Nav.Link href="#deets">Logout</Nav.Link>
+        <Nav.Link href="#deets"><FontAwesomeIcon icon={ faUser } />{ userInfo?.username }</Nav.Link></Nav>
     </>
   } else {
     menu = <>
       <Nav>
-        { isAuthenticated
-          ? <Nav.Link>{ userInfo?.username } </Nav.Link>
-          : <Nav.Link onClick={ () => signIn() }>Login</Nav.Link> }
-      <Nav.Link href="#deets">Sign Up</Nav.Link></Nav>
+        <Nav.Link onClick={ () => signIn() }>Login</Nav.Link>
+        <Nav.Link href="#deets">Sign Up</Nav.Link>
+      </Nav>
     </>
   }
+
   return menu;
 }
 
